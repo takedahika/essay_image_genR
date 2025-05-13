@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章画像作成</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&family=Sawarabi+Mincho&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <p class="sub-header">書き手のための</p>
+        <h1>文章画像作成</h1>
+
+        <!-- ... (他のセクションはV2.6.0と同じ) ... -->
+        <div class="section">
+            <div class="input-group">
+                <label for="essay-title">タイトル</label>
+                <input type="text" id="essay-title" placeholder="エッセイのタイトルを入力 (各画像の先頭に表示されます)">
+            </div>
+
+            <div class="input-group">
+                <label for="essay-text">文章入力欄</label>
+                <div class="textarea-wrapper">
+                    <textarea id="essay-text" rows="10" placeholder="ここにエッセイの本文を入力してください..."></textarea>
+                    <button id="insert-page-break-button" title="カーソル位置にページ区切りを挿入">改ページ挿入</button>
+                </div>
+                <small>区切りたい箇所にカーソルを合わせて「改ページ挿入」ボタンを押すか、「【ページ区切り】」と手入力してください。</small>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group half-width">
+                    <label for="author-name">作者名</label>
+                    <input type="text" id="author-name" placeholder="例: 文学 太郎">
+                </div>
+
+                <div class="input-group half-width">
+                    <label for="sns-account">アカウント名</label>
+                    <input type="text" id="sns-account" placeholder="例: X: @bungakutaro">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>画像のサイズ変更</h2>
+            <div class="sns-selector">
+                <button class="sns-btn" data-sns="twitter_vertical">Twitter 縦</button>
+                <button class="sns-btn" data-sns="instagram_feed">Instagram</button>
+                <button class="sns-btn" data-sns="instagram_story">Instagram Story</button>
+                <button class="sns-btn" data-sns="square">正方形</button>
+            </div>
+            <select id="sns-type" style="display: none;">
+                <option value="twitter_vertical">Twitter 縦 (4:5)</option>
+                <option value="instagram_feed">Instagram フィード (4:5)</option>
+                <option value="instagram_story">Instagram ストーリー (9:16)</option>
+                <option value="square">汎用 正方形 (1:1)</option>
+            </select>
+        </div>
+
+        <div class="section advanced-settings-toggle">
+            <button id="toggle-advanced-settings-button" class="action-button secondary-button">
+                <span class="toggle-icon">▶</span> ちょっと高度な設定
+            </button>
+        </div>
+        <div id="advanced-settings-panel" class="section advanced-settings-panel" style="display: none;">
+            <h3>カラー設定</h3>
+            <div class="input-row color-setting-row">
+                <div class="input-group color-picker-group">
+                    <label for="bg-color-picker">背景色:</label>
+                    <div>
+                        <input type="color" id="bg-color-picker" value="#fdfbf7">
+                        <input type="text" id="bg-color-code" class="color-code-input" value="#fdfbf7">
+                    </div>
+                </div>
+                <div class="input-group color-picker-group">
+                    <label for="text-color-picker">文字色:</label>
+                    <div>
+                        <input type="color" id="text-color-picker" value="#383838">
+                        <input type="text" id="text-color-code" class="color-code-input" value="#383838">
+                    </div>
+                </div>
+            </div>
+            <h3>フォント設定</h3>
+            <div class="input-group">
+                <label for="font-family-select">フォント:</label>
+                <select id="font-family-select">
+                    <option value="'Noto Serif JP', serif">Noto Serif JP (明朝)</option>
+                    <option value="'Sawarabi Mincho', serif">さわらび明朝</option>
+                    <option value="'Noto Sans JP', sans-serif">Noto Sans JP (ゴシック)</option>
+                </select>
+            </div>
+            <h3>最終ページ プロフィール画像</h3>
+            <div class="input-group">
+                <label for="profile-image-upload">画像アップロード (256x256pxの正方形推奨、円形で表示されます):</label>
+                <input type="file" id="profile-image-upload" accept="image/*">
+                <div class="profile-image-preview-container">
+                    <img id="profile-image-preview" src="#" alt="プロフィール画像プレビュー" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <button id="generate-preview-button" class="action-button primary-button">プレビューを生成</button>
+
+        <div class="preview-section" style="display: none;">
+            <h2>プレビュー</h2>
+            <div id="preview-area">
+                <!-- ここにJSでプレビュー画像が表示される -->
+            </div>
+            <button id="download-zip-button" class="action-button download-button">ダウンロード</button>
+        </div>
+
+        <!-- ★ 寄付ボタンをテキストリンクに変更 -->
+        <div class="section donate-section text-link-section">
+             <a href="#" id="donate-link" class="donate-link">☕ 開発者に寄付（準備中）</a>
+        </div>
+
+
+        <div id="loading-message" style="display: none;">
+            処理中です... しばらくお待ちください。
+        </div>
+        <div id="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

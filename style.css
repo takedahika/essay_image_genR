@@ -1,0 +1,506 @@
+/* ... (V2.6.0のCSSから寄付ボタンのスタイルを変更・追加) ... */
+/* 基本スタイル */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: 'Noto Serif JP', serif;
+    line-height: 1.7;
+    background-color: #f8f9fa;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    background-color: #fff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.sub-header {
+    text-align: center;
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-bottom: -20px;
+    font-weight: 500;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 30px;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+h2 {
+    font-size: 1.4em;
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0f0f0;
+    font-weight: 500;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+.advanced-settings-panel h3 {
+    font-size: 1.1em;
+    color: #495057;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+
+.section {
+    margin-bottom: 30px;
+}
+/* ★ テキストリンク用のセクションスタイル */
+.text-link-section {
+    text-align: center; /* リンクを中央に */
+    margin-top: 30px;
+}
+
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+    font-size: 0.95em;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.input-group textarea,
+.input-group input[type="text"],
+.input-group input[type="file"],
+.input-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: white;
+}
+.input-group input[type="color"] {
+    width: 60px;
+    height: 40px;
+    padding: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.color-code-input {
+    flex-grow: 1;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+.color-setting-row .color-picker-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.color-setting-row .color-picker-group > div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.color-setting-row .color-picker-group label {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+
+.input-group textarea:focus,
+.input-group input[type="text"]:focus,
+.input-group input[type="file"]:focus,
+.input-group input[type="color"]:focus,
+.input-group select:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.textarea-wrapper {
+    position: relative;
+    margin-bottom: 5px;
+}
+
+#insert-page-break-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+#insert-page-break-button:hover {
+    background-color: #5a6268;
+}
+
+.input-group small {
+    font-size: 0.8em;
+    color: #6c757d;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.input-row {
+    display: flex;
+    gap: 20px;
+}
+.input-group.half-width {
+    flex: 1;
+}
+
+.profile-image-preview-container {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-top: 10px;
+    border: 1px solid #eee;
+}
+#profile-image-preview {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+
+
+/* SNS選択ボタン */
+.sns-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.sns-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #e9ecef;
+    color: #495057;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.sns-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.sns-btn.active {
+    color: white;
+}
+.sns-btn[data-sns="twitter_vertical"].active {
+    background-color: #1a8cd8;
+}
+.sns-btn[data-sns="instagram_feed"].active,
+.sns-btn[data-sns="instagram_story"].active {
+    background-image: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+}
+.sns-btn[data-sns="square"].active {
+    background-color: #7952b3;
+}
+
+
+/* アクションボタン共通スタイル */
+.action-button {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 1.05em;
+    font-weight: 500;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    margin-top: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-family: 'Noto Sans JP', sans-serif;
+}
+.action-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.action-button:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.primary-button {
+    background-color: #0d6efd;
+}
+.secondary-button {
+    background-color: #6c757d;
+    font-size: 0.95em;
+    padding: 10px 15px;
+}
+.secondary-button:hover {
+    background-color: #5a6268;
+}
+.secondary-button .toggle-icon {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    margin-right: 5px;
+}
+.secondary-button.open .toggle-icon {
+    transform: rotate(90deg);
+}
+
+
+.download-button {
+    background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+}
+
+/* ★ 寄付リンクのスタイル */
+.donate-link {
+    display: inline-block; /* ボタンのように振る舞わせない */
+    color: #0d6efd; /* リンク色 */
+    text-decoration: none; /* 下線なし */
+    font-size: 0.9em;
+    padding: 5px 0; /* 上下の余白 */
+    transition: color 0.2s ease;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+.donate-link:hover {
+    text-decoration: underline; /* ホバーで下線 */
+    color: #0a58ca;
+}
+
+
+.advanced-settings-panel {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: -15px;
+    margin-bottom: 30px;
+    background-color: #fdfdfd;
+}
+
+
+/* プレビューエリア */
+.preview-section {
+    margin-top: 30px;
+}
+#preview-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    min-height: 100px;
+    justify-content: center;
+}
+
+.preview-image-container {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    overflow: hidden;
+    background-color: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.preview-image-container .content-area-preview {
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    flex-grow: 1;
+}
+
+.preview-image-container .page-number-preview {
+    text-align: center;
+}
+
+/* メッセージエリア */
+#loading-message, #error-message {
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 20px;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+#loading-message {
+    background-color: #e9ecef;
+    color: #495057;
+}
+#error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* =============================================== */
+/* レスポンシブ対応 (例: 768px以下)                */
+/* =============================================== */
+@media (max-width: 768px) {
+    body {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .container {
+        padding: 20px 15px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    .advanced-settings-panel h3 {
+        font-size: 1em;
+    }
+
+    .input-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .input-group.half-width {
+        width: 100%;
+    }
+
+    .color-setting-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .color-setting-row .color-picker-group {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .color-setting-row .color-picker-group:last-child {
+        margin-bottom: 0;
+    }
+    .input-group input[type="color"] {
+        width: 50px;
+    }
+    .color-code-input {
+        margin-left: 8px;
+    }
+
+
+    .sns-selector {
+        gap: 8px;
+        justify-content: center;
+    }
+    .sns-btn {
+        padding: 8px 14px;
+        font-size: 0.85em;
+    }
+
+    .action-button {
+        padding: 12px 18px;
+        font-size: 1em;
+    }
+    .secondary-button {
+        font-size: 0.9em;
+        padding: 9px 14px;
+    }
+    /* ★ 寄付リンクのレスポンシブ調整は特に不要か、必要ならfont-sizeなど */
+    .donate-link {
+        font-size: 0.85em;
+    }
+
+
+    #preview-area {
+        gap: 10px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px 5px;
+    }
+    .container {
+        padding: 15px 10px;
+        border-radius: 8px;
+    }
+    h1 {
+        font-size: 1.6em;
+    }
+    .sub-header {
+        font-size: 0.8em;
+        margin-bottom: -15px;
+    }
+
+    .sns-btn {
+        padding: 7px 12px;
+        font-size: 0.8em;
+    }
+    .action-button {
+        padding: 10px 15px;
+        font-size: 0.95em;
+    }
+    #insert-page-break-button {
+        padding: 5px 8px;
+        font-size: 0.75em;
+    }
+    .donate-link {
+        font-size: 0.8em;
+    }
+
+    #preview-area {
+        justify-content: center;
+    }
+}
