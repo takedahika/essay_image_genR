@@ -1,18 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM Content Loaded - Script Execution Started V2.6.5");
+
     // DOM要素取得
     const essayTitleInput = document.getElementById('essay-title');
     const essayTextInput = document.getElementById('essay-text');
     const authorNameInput = document.getElementById('author-name');
     const snsAccountInput = document.getElementById('sns-account');
-    const snsTypeSelect = document.getElementById('sns-type');
+    const snsTypeSelect = document.getElementById('sns-type'); // 隠しselect
     const insertPageBreakButton = document.getElementById('insert-page-break-button');
     const generatePreviewButton = document.getElementById('generate-preview-button');
     const downloadZipButton = document.getElementById('download-zip-button');
+    const downloadIndividualButton = document.getElementById('download-individual-button');
     const previewSection = document.querySelector('.preview-section');
     const previewArea = document.getElementById('preview-area');
     const loadingMessage = document.getElementById('loading-message');
     const errorMessage = document.getElementById('error-message');
-    const snsButtons = document.querySelectorAll('.sns-btn');
+    const snsButtons = document.querySelectorAll('.sns-btn'); // 表示用ボタン
     const toggleAdvancedSettingsButton = document.getElementById('toggle-advanced-settings-button');
     const advancedSettingsPanel = document.getElementById('advanced-settings-panel');
     const bgColorPicker = document.getElementById('bg-color-picker');
@@ -22,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontFamilySelect = document.getElementById('font-family-select');
     const profileImageUpload = document.getElementById('profile-image-upload');
     const profileImagePreview = document.getElementById('profile-image-preview');
-    const donateLink = document.getElementById('donate-link'); // ★ 追加
+    // donateLink はHTMLで直接リンクするため、JSでの取得とイベントリスナーは不要
 
     const PAGE_BREAK_MARKER = '【ページ区切り】';
     let generatedPagesData = [];
@@ -39,9 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         fontFamily: "'Noto Serif JP', serif",
         lineHeight: '1.8',
         padding: '100px',
-        backgroundColor: '#fdfbf7', // デフォルト。ユーザー指定で上書き
-        textColor: '#383838',       // デフォルト。ユーザー指定で上書き
-        // pageNumberColor は currentTextColor を参照するため削除
+        backgroundColor: '#fdfbf7',
+        textColor: '#383838',
         pageNumberFontSize: '22px',
         titleFontSizeMultiplier: 1.3,
         titleBottomMargin: '30px',
@@ -53,45 +55,56 @@ document.addEventListener('DOMContentLoaded', () => {
         profileImageSize: 256
     };
 
+    // 初期値設定
     let currentBackgroundColor = bgColorPicker.value;
     let currentTextColor = textColorPicker.value;
     let currentFontFamily = fontFamilySelect.value;
+    let currentSelectedSnsKey = snsTypeSelect.options.length > 0 ? snsTypeSelect.options[0].value : Object.keys(SNS_CONFIGS)[0];
+    snsTypeSelect.value = currentSelectedSnsKey; // select要素の初期値を設定
+
+    // 初期アクティブボタン設定
+    snsButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sns === currentSelectedSnsKey);
+    });
+    console.log("Initial SNS Key:", currentSelectedSnsKey);
+
+    if (bgColorCodeInput) bgColorCodeInput.value = currentBackgroundColor;
+    if (textColorCodeInput) textColorCodeInput.value = currentTextColor;
+
 
     // --- イベントリスナー設定 ---
-    if (insertPageBreakButton) {
-        insertPageBreakButton.addEventListener('click', () => {
-            const cursorPos = essayTextInput.selectionStart;
-            const text = essayTextInput.value;
-            const newText = text.substring(0, cursorPos) + PAGE_BREAK_MARKER + text.substring(essayTextInput.selectionEnd);
-            essayTextInput.value = newText;
-            essayTextInput.focus();
-            essayTextInput.setSelectionRange(cursorPos + PAGE_BREAK_MARKER.length, cursorPos + PAGE_BREAK_MARKER.length);
-        });
-    }
+    insertPageBreakButton.addEventListener('click', () => {
+        console.log("Insert Page Break button clicked");
+        const cursorPos = essayTextInput.selectionStart;
+        const text = essayTextInput.value;
+        const newText = text.substring(0, cursorPos) + PAGE_BREAK_MARKER + text.substring(essayTextInput.selectionEnd);
+        essayTextInput.value = newText;
+        essayTextInput.focus();
+        essayTextInput.setSelectionRange(cursorPos + PAGE_BREAK_MARKER.length, cursorPos + PAGE_BREAK_MARKER.length);
+    });
 
-    if (snsButtons.length > 0) {
-        snsButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                snsButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                if (snsTypeSelect) snsTypeSelect.value = button.dataset.sns;
-            });
+    snsButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            console.log("SNS button clicked:", button.dataset.sns);
+            snsButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            currentSelectedSnsKey = button.dataset.sns;
+            snsTypeSelect.value = currentSelectedSnsKey; // 隠しselectも更新
         });
-    }
+    });
 
-    if (toggleAdvancedSettingsButton && advancedSettingsPanel) {
-        toggleAdvancedSettingsButton.addEventListener('click', () => {
-            const isOpen = advancedSettingsPanel.style.display === 'block';
-            advancedSettingsPanel.style.display = isOpen ? 'none' : 'block';
-            toggleAdvancedSettingsButton.classList.toggle('open', !isOpen);
-        });
-    }
+    toggleAdvancedSettingsButton.addEventListener('click', () => {
+        console.log("Toggle Advanced Settings button clicked");
+        const isOpen = advancedSettingsPanel.style.display === 'block';
+        advancedSettingsPanel.style.display = isOpen ? 'none' : 'block';
+        toggleAdvancedSettingsButton.classList.toggle('open', !isOpen);
+    });
 
-    if (bgColorPicker && bgColorCodeInput) {
-        bgColorPicker.addEventListener('input', (event) => {
-            currentBackgroundColor = event.target.value;
-            bgColorCodeInput.value = event.target.value;
-        });
+    bgColorPicker.addEventListener('input', (event) => {
+        currentBackgroundColor = event.target.value;
+        if (bgColorCodeInput) bgColorCodeInput.value = currentBackgroundColor;
+    });
+    if (bgColorCodeInput) {
         bgColorCodeInput.addEventListener('input', (event) => {
             const value = event.target.value.trim();
             if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value)) {
@@ -104,11 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (textColorPicker && textColorCodeInput) {
-        textColorPicker.addEventListener('input', (event) => {
-            currentTextColor = event.target.value;
-            textColorCodeInput.value = event.target.value;
-        });
+    textColorPicker.addEventListener('input', (event) => {
+        currentTextColor = event.target.value;
+        if (textColorCodeInput) textColorCodeInput.value = currentTextColor;
+    });
+    if (textColorCodeInput) {
         textColorCodeInput.addEventListener('input', (event) => {
             const value = event.target.value.trim();
             if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value)) {
@@ -121,137 +134,149 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (fontFamilySelect) {
-        fontFamilySelect.addEventListener('change', (event) => { currentFontFamily = event.target.value; });
+    fontFamilySelect.addEventListener('change', (event) => {
+        console.log("Font family changed to:", event.target.value);
+        currentFontFamily = event.target.value;
+    });
+
+    profileImageUpload.addEventListener('change', (event) => {
+        console.log("Profile image selected");
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                userProfileImageBase64 = e.target.result;
+                profileImagePreview.src = userProfileImageBase64;
+                profileImagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            userProfileImageBase64 = null;
+            profileImagePreview.style.display = 'none';
+        }
+    });
+
+    function getSelectedSnsConfig() {
+        console.log("getSelectedSnsConfig - currentSelectedSnsKey:", currentSelectedSnsKey);
+        if (currentSelectedSnsKey && SNS_CONFIGS[currentSelectedSnsKey]) {
+            return SNS_CONFIGS[currentSelectedSnsKey];
+        }
+        showError(`有効なSNSタイプが選択されていません。キー: '${currentSelectedSnsKey}'`);
+        console.error("Error in getSelectedSnsConfig: Invalid key -", currentSelectedSnsKey, "Available keys:", Object.keys(SNS_CONFIGS));
+        return null;
     }
 
-    if (profileImageUpload && profileImagePreview) {
-        profileImageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    userProfileImageBase64 = e.target.result;
-                    profileImagePreview.src = userProfileImageBase64;
-                    profileImagePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                userProfileImageBase64 = null;
-                profileImagePreview.style.display = 'none';
+    generatePreviewButton.addEventListener('click', async () => {
+        console.log("Generate Preview button clicked");
+        const config = getSelectedSnsConfig();
+        if (!config) return;
+
+        const essayTitle = essayTitleInput.value.trim();
+        const essayText = essayTextInput.value;
+        const authorName = authorNameInput.value.trim();
+        const snsAccount = snsAccountInput.value.trim();
+
+        if (!essayText.trim() && !essayTitle.trim()) {
+            showError('タイトルまたはエッセイ本文を入力してください。');
+            return;
+        }
+
+        showLoading(true);
+        previewArea.innerHTML = '';
+        generatedPagesData = [];
+
+        const renderer = createRendererDiv();
+        const textPages = splitTextIntoPagesByMarker(essayText, essayTitle, config, renderer);
+        if (renderer.parentNode) renderer.parentNode.removeChild(renderer);
+
+        const totalEssayPages = textPages.length;
+        for (let i = 0; i < totalEssayPages; i++) {
+            const pageText = textPages[i];
+            generatedPagesData.push({ type: 'essay', title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages });
+            addPageToPreview({ title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages, isFinal: false, config: config });
+        }
+
+        generatedPagesData.push({ type: 'final', author: authorName, sns: snsAccount, profileImage: userProfileImageBase64 });
+        addPageToPreview({ author: authorName, sns: snsAccount, profileImage: userProfileImageBase64, isFinal: true, config: config });
+
+        previewSection.style.display = 'block';
+        showLoading(false);
+    });
+
+    downloadZipButton.addEventListener('click', async () => {
+        console.log("Download ZIP button clicked");
+        const config = getSelectedSnsConfig();
+        if (!config) return;
+        if (generatedPagesData.length === 0) {
+            showError('まずプレビューを生成してください。');
+            return;
+        }
+        showLoading(true);
+        const zip = new JSZip();
+        try {
+            for (let i = 0; i < generatedPagesData.length; i++) {
+                const pageInfo = generatedPagesData[i];
+                const imageContainer = createActualImageContainer(pageInfo, config, i + 1);
+                const canvas = await html2canvas(imageContainer, {
+                    scale: 2, useCORS: true, backgroundColor: null,
+                    width: config.width, height: config.height,
+                    windowWidth: config.width, windowHeight: config.height, logging: false
+                });
+                const fileName = pageInfo.type === 'essay'
+                    ? `page_${String(pageInfo.pageNum).padStart(2, '0')}.png`
+                    : 'final_page.png';
+                zip.file(fileName, canvas.toDataURL('image/png').split(',')[1], { base64: true });
+                if (imageContainer.parentNode) imageContainer.parentNode.removeChild(imageContainer);
             }
-        });
-    }
-
-    if (donateLink) {
-        donateLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            alert('寄付機能は準備中です！PayPalのリンクに置き換えてください。');
-            // 後でここにPayPalのリンクを設定:
-            // window.open('YOUR_PAYPAL_LINK_HERE', '_blank');
-        });
-    }
-    
-    if (generatePreviewButton) {
-        generatePreviewButton.addEventListener('click', async () => {
-            const essayTitle = essayTitleInput.value.trim();
-            const essayText = essayTextInput.value;
-            const authorName = authorNameInput.value.trim();
-            const snsAccount = snsAccountInput.value.trim();
-            const selectedSnsKey = snsTypeSelect.value;
-            if (!SNS_CONFIGS[selectedSnsKey]) {
-                showError('有効なSNSタイプが選択されていません。');
-                return;
-            }
-            const config = SNS_CONFIGS[selectedSnsKey];
-
-            if (!essayText.trim() && !essayTitle.trim()) {
-                showError('タイトルまたはエッセイ本文を入力してください。');
-                return;
-            }
-
-            showLoading(true);
-            if (previewArea) previewArea.innerHTML = '';
-            generatedPagesData = [];
-
-            const renderer = createRendererDiv();
-            const textPages = splitTextIntoPagesByMarker(essayText, essayTitle, config, renderer);
-            if (renderer.parentNode) {
-                renderer.parentNode.removeChild(renderer);
-            }
-
-            const totalEssayPages = textPages.length;
-
-            for (let i = 0; i < totalEssayPages; i++) {
-                const pageText = textPages[i];
-                generatedPagesData.push({ type: 'essay', title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages });
-                addPageToPreview({ title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages, isFinal: false, config: config });
-            }
-
-            generatedPagesData.push({ type: 'final', author: authorName, sns: snsAccount, profileImage: userProfileImageBase64 });
-            addPageToPreview({ author: authorName, sns: snsAccount, profileImage: userProfileImageBase64, isFinal: true, config: config });
-
-            if (previewSection) previewSection.style.display = 'block';
+            const zipBlob = await zip.generateAsync({ type: 'blob' });
+            saveAs(zipBlob, `${currentSelectedSnsKey}_essay_images.zip`);
+        } catch (err) {
+            console.error('ZIP生成エラー:', err);
+            showError('画像の生成またはZIP化中にエラーが発生しました。');
+        } finally {
             showLoading(false);
-        });
-    }
+        }
+    });
 
-    if (downloadZipButton) {
-        downloadZipButton.addEventListener('click', async () => {
-            if (generatedPagesData.length === 0) {
-                showError('まずプレビューを生成してください。');
-                return;
+    downloadIndividualButton.addEventListener('click', async () => {
+        console.log("Download Individual button clicked");
+        const config = getSelectedSnsConfig();
+        if (!config) return;
+        if (generatedPagesData.length === 0) {
+            showError('まずプレビューを生成してください。');
+            return;
+        }
+        showLoading(true);
+        try {
+            for (let i = 0; i < generatedPagesData.length; i++) {
+                const pageInfo = generatedPagesData[i];
+                const imageContainer = createActualImageContainer(pageInfo, config, i + 1);
+                const canvas = await html2canvas(imageContainer, {
+                    scale: 2, useCORS: true, backgroundColor: null,
+                    width: config.width, height: config.height,
+                    windowWidth: config.width, windowHeight: config.height, logging: false
+                });
+                const link = document.createElement('a');
+                const fileName = pageInfo.type === 'essay'
+                    ? `page_${String(pageInfo.pageNum).padStart(2, '0')}.png`
+                    : 'final_page.png';
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                if (imageContainer.parentNode) imageContainer.parentNode.removeChild(imageContainer);
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
-            showLoading(true);
+        } catch (err) {
+            console.error('個別画像生成エラー:', err);
+            showError('個別画像の生成中にエラーが発生しました。');
+        } finally {
+            showLoading(false);
+        }
+    });
 
-            const selectedSnsKey = snsTypeSelect.value;
-            const config = SNS_CONFIGS[selectedSnsKey];
-            const zip = new JSZip();
-
-            try {
-                for (let i = 0; i < generatedPagesData.length; i++) {
-                    const pageInfo = generatedPagesData[i];
-                    const imageContainer = createActualImageContainer(pageInfo, config, i + 1);
-                    const canvas = await html2canvas(imageContainer, {
-                        scale: 2,
-                        useCORS: true,
-                        backgroundColor: null,
-                        width: config.width,
-                        height: config.height,
-                        windowWidth: config.width,
-                        windowHeight: config.height,
-                        logging: false
-                    });
-                    const fileName = pageInfo.type === 'essay'
-                        ? `page_${String(pageInfo.pageNum).padStart(2, '0')}.png`
-                        : 'final_page.png';
-                    zip.file(fileName, canvas.toDataURL('image/png').split(',')[1], { base64: true });
-                    if (imageContainer.parentNode) {
-                        imageContainer.parentNode.removeChild(imageContainer);
-                    }
-                }
-                const zipBlob = await zip.generateAsync({ type: 'blob' });
-                saveAs(zipBlob, `${selectedSnsKey}_essay_images.zip`);
-            } catch (err) {
-                console.error('ZIP生成エラー:', err);
-                showError('画像の生成またはZIP化中にエラーが発生しました。');
-            } finally {
-                showLoading(false);
-            }
-        });
-    }
-
-    // 初期SNS設定
-    if (snsTypeSelect) snsTypeSelect.value = "twitter_vertical";
-    const initialSnsValue = snsTypeSelect ? snsTypeSelect.value : "twitter_vertical";
-    const initialActiveButton = document.querySelector(`.sns-btn[data-sns="${initialSnsValue}"]`);
-    if (initialActiveButton) { initialActiveButton.classList.add('active'); }
-    // 初期カラーコード設定
-    if (bgColorCodeInput && bgColorPicker) bgColorCodeInput.value = bgColorPicker.value;
-    if (textColorCodeInput && textColorPicker) textColorCodeInput.value = textColorPicker.value;
-
-
-    // --- 主要関数 ---
+    // --- 主要関数 (V2.6.2から変更なし、ここにペースト) ---
     function splitTextIntoPagesByMarker(text, essayTitle, config, renderer) {
         const rawPages = text.split(PAGE_BREAK_MARKER);
         const finalPages = [];
@@ -291,11 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 continue;
             }
             
-            renderer.innerHTML = '';
+            renderer.innerHTML = ''; // 本文計測のためにクリア
+            // renderer の幅とフォントサイズは上で設定済みなので、ここでは再設定不要かもしれないが、念のため
             renderer.style.width = `${config.width - (parseInt(COMMON_IMAGE_STYLES.padding) * 2)}px`;
             renderer.style.fontSize = `${config.baseFontSize}px`;
 
-            renderer.textContent = rawPageText;
+            renderer.textContent = rawPageText; // 本文のみで高さを計測
             if (renderer.offsetHeight <= pageContentHeightMax) {
                 finalPages.push(rawPageText);
             } else {
@@ -325,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentChunk.trim() !== '') {
                     finalPages.push(currentChunk.trimEnd());
                 } else if (finalPages.length > 0 && finalPages[finalPages.length -1].trim() === '' && rawPageText.trim() !== '') {
-                    // Skip adding an empty page if the previous one was also effectively empty
+                    // Skip
                 } else if (finalPages.length === 0 && currentChunk.trim() === '') {
                     finalPages.push('');
                 }
@@ -390,12 +416,12 @@ document.addEventListener('DOMContentLoaded', () => {
             pageNumberEl.classList.add('page-number-preview');
             pageNumberEl.textContent = `${pageNum} / ${totalPages}`;
             pageNumberEl.style.fontSize = `${Math.max(5, parseInt(COMMON_IMAGE_STYLES.pageNumberFontSize) * previewScale * 0.9)}px`;
-            pageNumberEl.style.color = currentTextColor; // ★ ページ番号の色
-            pageNumberEl.style.opacity = 0.7;           // ★ ページ番号の透明度
+            pageNumberEl.style.color = currentTextColor;
+            pageNumberEl.style.opacity = 0.7;
             pageNumberEl.style.padding = `${previewPadding * 0.15}px 0`;
             previewContainer.appendChild(contentArea);
             previewContainer.appendChild(pageNumberEl);
-        } else { // 最終ページ
+        } else {
             const finalPreviewPadding = Math.max(8, parseInt(COMMON_IMAGE_STYLES.finalPagePadding) * previewScale * 0.8);
             contentArea.style.padding = `${finalPreviewPadding}px`;
             contentArea.style.display = 'flex';
@@ -497,8 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const pageNumberEl = document.createElement('div');
             pageNumberEl.style.textAlign = 'center';
-            pageNumberEl.style.color = currentTextColor; // ★ ページ番号の色
-            pageNumberEl.style.opacity = 0.7;           // ★ ページ番号の透明度
+            pageNumberEl.style.color = currentTextColor;
+            pageNumberEl.style.opacity = 0.7;
             pageNumberEl.style.fontSize = COMMON_IMAGE_STYLES.pageNumberFontSize;
             pageNumberEl.style.paddingTop = '20px';
             pageNumberEl.style.flexShrink = '0';
@@ -570,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loadingMessage) loadingMessage.style.display = isLoading ? 'block' : 'none';
         if (generatePreviewButton) generatePreviewButton.disabled = isLoading;
         if (downloadZipButton) downloadZipButton.disabled = isLoading;
+        if (downloadIndividualButton) downloadIndividualButton.disabled = isLoading;
         if (isLoading && errorMessage) errorMessage.style.display = 'none';
     }
 

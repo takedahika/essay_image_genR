@@ -14,7 +14,7 @@
         <p class="sub-header">書き手のための</p>
         <h1>文章画像作成</h1>
 
-        <!-- ... (他のセクションはV2.6.0と同じ) ... -->
+        <!-- ... (他のセクションはV2.6.3と同じ) ... -->
         <div class="section">
             <div class="input-group">
                 <label for="essay-title">タイトル</label>
@@ -33,12 +33,12 @@
             <div class="input-row">
                 <div class="input-group half-width">
                     <label for="author-name">作者名</label>
-                    <input type="text" id="author-name" placeholder="例: 文学 太郎">
+                    <input type="text" id="author-name" placeholder="例: 山田 太郎">
                 </div>
 
                 <div class="input-group half-width">
                     <label for="sns-account">アカウント名</label>
-                    <input type="text" id="sns-account" placeholder="例: X: @bungakutaro">
+                    <input type="text" id="sns-account" placeholder="例: X: @yamadataro">
                 </div>
             </div>
         </div>
@@ -108,12 +108,15 @@
             <div id="preview-area">
                 <!-- ここにJSでプレビュー画像が表示される -->
             </div>
-            <button id="download-zip-button" class="action-button download-button">ダウンロード</button>
+            <div class="download-options">
+                <button id="download-zip-button" class="action-button download-button">ZIPで一括ダウンロード</button>
+                <button id="download-individual-button" class="action-button download-button-alt">画像を1枚ずつダウンロード</button>
+            </div>
         </div>
 
-        <!-- ★ 寄付ボタンをテキストリンクに変更 -->
         <div class="section donate-section text-link-section">
-             <a href="#" id="donate-link" class="donate-link">☕ 開発者に寄付（準備中）</a>
+             <!-- ★★★ href属性に直接PayPalリンクを設定 ★★★ -->
+             <a href="https://www.paypal.com/ncp/payment/6AQTJ537HK9QC" target="_blank" id="donate-link" class="donate-link">☕ 開発者に寄付</a>
         </div>
 
 

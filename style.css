@@ -1,4 +1,4 @@
-/* ... (V2.6.0のCSSから寄付ボタンのスタイルを変更・追加) ... */
+/* ... (V2.6.2のCSSから #insert-page-break-button のスタイルを変更) ... */
 /* 基本スタイル */
 html, body {
     margin: 0;
@@ -76,9 +76,8 @@ h2 {
 .section {
     margin-bottom: 30px;
 }
-/* ★ テキストリンク用のセクションスタイル */
 .text-link-section {
-    text-align: center; /* リンクを中央に */
+    text-align: center;
     margin-top: 30px;
 }
 
@@ -153,23 +152,24 @@ h2 {
 }
 
 .textarea-wrapper {
-    position: relative;
+    position: relative; /* ★ ボタンの絶対配置の基準にする */
     margin-bottom: 5px;
 }
 
 #insert-page-break-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 6px 10px;
+    bottom: 10px; /* ★ 右下に変更 */
+    right: 10px;  /* ★ 右下に変更 */
+    padding: 5px 8px; /* 少し小さく */
     background-color: #6c757d;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 0.8em;
+    font-size: 0.75em; /* 少し小さく */
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-family: 'Noto Sans JP', sans-serif;
+    z-index: 10; /* 他の要素より手前に表示（念のため） */
 }
 #insert-page-break-button:hover {
     background-color: #5a6268;
@@ -296,23 +296,38 @@ h2 {
     transform: rotate(90deg);
 }
 
+.download-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+.download-options .action-button {
+    margin-top: 0;
+    flex: 1;
+}
 
 .download-button {
     background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
 }
+.download-button-alt {
+    background-color: #198754;
+}
+.download-button-alt:hover {
+    background-color: #157347;
+}
 
-/* ★ 寄付リンクのスタイル */
+
 .donate-link {
-    display: inline-block; /* ボタンのように振る舞わせない */
-    color: #0d6efd; /* リンク色 */
-    text-decoration: none; /* 下線なし */
+    display: inline-block;
+    color: #0d6efd;
+    text-decoration: none;
     font-size: 0.9em;
-    padding: 5px 0; /* 上下の余白 */
+    padding: 5px 0;
     transition: color 0.2s ease;
     font-family: 'Noto Sans JP', sans-serif;
 }
 .donate-link:hover {
-    text-decoration: underline; /* ホバーで下線 */
+    text-decoration: underline;
     color: #0a58ca;
 }
 
@@ -456,9 +471,13 @@ h2 {
         font-size: 0.9em;
         padding: 9px 14px;
     }
-    /* ★ 寄付リンクのレスポンシブ調整は特に不要か、必要ならfont-sizeなど */
     .donate-link {
         font-size: 0.85em;
+    }
+
+    .download-options {
+        flex-direction: column;
+        gap: 10px;
     }
 
 
@@ -495,6 +514,8 @@ h2 {
     #insert-page-break-button {
         padding: 5px 8px;
         font-size: 0.75em;
+        bottom: 5px; /* スマホではさらに調整 */
+        right: 5px;
     }
     .donate-link {
         font-size: 0.8em;
