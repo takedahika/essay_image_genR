@@ -549,7 +549,7 @@ h2 {
         border-radius: 8px;
     }
     #animated-heading {
-        font-size: 1.5em; /* ← スマホ向けに小さくする (例) */
+        font-size: 1.8em; /* ← スマホ向けに小さくする (例) */
         /* line-height: 1.5;  必要に応じて行間も調整 */
     }
 
@@ -594,6 +594,6 @@ h2 {
 
 @media (max-width: 380px) {
     #animated-heading {
-        font-size: 1.2em; /* ← さらに小さい画面向け (例) */
+        font-size: 1.6em; /* ← さらに小さい画面向け (例) */
     }
 }
