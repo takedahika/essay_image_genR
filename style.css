@@ -41,12 +41,12 @@ body {
 
 #animated-heading {
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 2.1em;
+    font-size: 2.4em; /* デスクトップ向けの基本サイズ */
     color: #2c3e50;
     font-weight: 700;
     line-height: 1.4;
     padding: 0 20px;
-    max-width: 90vw;
+    max-width: 90vw; 
 }
 
 #animated-heading .anim-char {
@@ -460,8 +460,8 @@ h2 {
     #main-app-container { /* Was .container */
         padding: 20px 15px;
     }
-    #animated-heading {
-        font-size: 2em;
+    #animated-heading { /* 768px 以下共通の animated-heading スタイルをここにも適用（480px, 380pxで上書きされる可能性も考慮） */
+        font-size: 2em; /* 768px以下での基本サイズ */
     }
 
     h1 {
@@ -549,7 +549,8 @@ h2 {
         border-radius: 8px;
     }
     #animated-heading {
-        font-size: 1.6em;
+        font-size: 1.8em; /* ← スマホ向けに小さくする (例) */
+        /* line-height: 1.5;  必要に応じて行間も調整 */
     }
 
     h1 {
@@ -588,5 +589,11 @@ h2 {
 
     #preview-area {
         justify-content: center;
+    }
+}
+
+@media (max-width: 380px) {
+    #animated-heading {
+        font-size: 1.6em; /* ← さらに小さい画面向け (例) */
     }
 }
