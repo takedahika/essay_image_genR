@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM Content Loaded - Script Execution Started V2.6.5");
+    console.log("DOM Content Loaded - Script Execution Started V2.6.6");
 
     // DOM要素取得
     const essayTitleInput = document.getElementById('essay-title');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const insertPageBreakButton = document.getElementById('insert-page-break-button');
     const generatePreviewButton = document.getElementById('generate-preview-button');
     const downloadZipButton = document.getElementById('download-zip-button');
-    const downloadIndividualButton = document.getElementById('download-individual-button');
+    // const downloadIndividualButton = document.getElementById('download-individual-button'); // 削除
     const previewSection = document.querySelector('.preview-section');
     const previewArea = document.getElementById('preview-area');
     const loadingMessage = document.getElementById('loading-message');
@@ -25,10 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontFamilySelect = document.getElementById('font-family-select');
     const profileImageUpload = document.getElementById('profile-image-upload');
     const profileImagePreview = document.getElementById('profile-image-preview');
-    // donateLink はHTMLで直接リンクするため、JSでの取得とイベントリスナーは不要
 
     const PAGE_BREAK_MARKER = '【ページ区切り】';
-    let generatedPagesData = [];
+    let generatedPagesData = []; // { type, title, text, pageNum, totalPages, author, sns, profileImage, imageDataUrl }
     let userProfileImageBase64 = null;
 
     const SNS_CONFIGS = {
@@ -39,11 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const COMMON_IMAGE_STYLES = {
-        fontFamily: "'Noto Serif JP', serif",
+        fontFamily: "'Noto Serif JP', serif", // 初期値, currentFontFamilyで上書き
         lineHeight: '1.8',
         padding: '100px',
-        backgroundColor: '#fdfbf7',
-        textColor: '#383838',
+        backgroundColor: '#fdfbf7', // 初期値, currentBackgroundColorで上書き
+        textColor: '#383838', // 初期値, currentTextColorで上書き
         pageNumberFontSize: '22px',
         titleFontSizeMultiplier: 1.3,
         titleBottomMargin: '30px',
@@ -55,26 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
         profileImageSize: 256
     };
 
-    // 初期値設定
     let currentBackgroundColor = bgColorPicker.value;
     let currentTextColor = textColorPicker.value;
     let currentFontFamily = fontFamilySelect.value;
     let currentSelectedSnsKey = snsTypeSelect.options.length > 0 ? snsTypeSelect.options[0].value : Object.keys(SNS_CONFIGS)[0];
-    snsTypeSelect.value = currentSelectedSnsKey; // select要素の初期値を設定
+    snsTypeSelect.value = currentSelectedSnsKey;
 
-    // 初期アクティブボタン設定
     snsButtons.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.sns === currentSelectedSnsKey);
     });
-    console.log("Initial SNS Key:", currentSelectedSnsKey);
-
     if (bgColorCodeInput) bgColorCodeInput.value = currentBackgroundColor;
     if (textColorCodeInput) textColorCodeInput.value = currentTextColor;
 
-
-    // --- イベントリスナー設定 ---
     insertPageBreakButton.addEventListener('click', () => {
-        console.log("Insert Page Break button clicked");
         const cursorPos = essayTextInput.selectionStart;
         const text = essayTextInput.value;
         const newText = text.substring(0, cursorPos) + PAGE_BREAK_MARKER + text.substring(essayTextInput.selectionEnd);
@@ -85,19 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     snsButtons.forEach(button => {
         button.addEventListener('click', () => {
-            console.log("SNS button clicked:", button.dataset.sns);
             snsButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             currentSelectedSnsKey = button.dataset.sns;
-            snsTypeSelect.value = currentSelectedSnsKey; // 隠しselectも更新
+            snsTypeSelect.value = currentSelectedSnsKey;
         });
     });
 
     toggleAdvancedSettingsButton.addEventListener('click', () => {
-        console.log("Toggle Advanced Settings button clicked");
         const isOpen = advancedSettingsPanel.style.display === 'block';
         advancedSettingsPanel.style.display = isOpen ? 'none' : 'block';
         toggleAdvancedSettingsButton.classList.toggle('open', !isOpen);
+        toggleAdvancedSettingsButton.querySelector('.toggle-icon').textContent = isOpen ? '▶' : '▼';
     });
 
     bgColorPicker.addEventListener('input', (event) => {
@@ -107,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bgColorCodeInput) {
         bgColorCodeInput.addEventListener('input', (event) => {
             const value = event.target.value.trim();
-            if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value)) {
+            if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value) || /^#([0-9A-Fa-f]{6}){1,2}$/.test(value)) {
                 currentBackgroundColor = value;
                 bgColorPicker.value = value;
                 event.target.style.borderColor = '';
@@ -124,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (textColorCodeInput) {
         textColorCodeInput.addEventListener('input', (event) => {
             const value = event.target.value.trim();
-            if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value)) {
+             if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value) || /^#([0-9A-Fa-f]{6}){1,2}$/.test(value)) {
                 currentTextColor = value;
                 textColorPicker.value = value;
                 event.target.style.borderColor = '';
@@ -135,12 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fontFamilySelect.addEventListener('change', (event) => {
-        console.log("Font family changed to:", event.target.value);
         currentFontFamily = event.target.value;
     });
 
     profileImageUpload.addEventListener('change', (event) => {
-        console.log("Profile image selected");
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -157,17 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function getSelectedSnsConfig() {
-        console.log("getSelectedSnsConfig - currentSelectedSnsKey:", currentSelectedSnsKey);
         if (currentSelectedSnsKey && SNS_CONFIGS[currentSelectedSnsKey]) {
             return SNS_CONFIGS[currentSelectedSnsKey];
         }
         showError(`有効なSNSタイプが選択されていません。キー: '${currentSelectedSnsKey}'`);
-        console.error("Error in getSelectedSnsConfig: Invalid key -", currentSelectedSnsKey, "Available keys:", Object.keys(SNS_CONFIGS));
         return null;
     }
 
     generatePreviewButton.addEventListener('click', async () => {
-        console.log("Generate Preview button clicked");
         const config = getSelectedSnsConfig();
         if (!config) return;
 
@@ -189,26 +175,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const textPages = splitTextIntoPagesByMarker(essayText, essayTitle, config, renderer);
         if (renderer.parentNode) renderer.parentNode.removeChild(renderer);
 
+        const essayPagesData = [];
         const totalEssayPages = textPages.length;
         for (let i = 0; i < totalEssayPages; i++) {
             const pageText = textPages[i];
-            generatedPagesData.push({ type: 'essay', title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages });
-            addPageToPreview({ title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages, isFinal: false, config: config });
+            essayPagesData.push({ type: 'essay', title: essayTitle, text: pageText, pageNum: i + 1, totalPages: totalEssayPages });
         }
+        const finalPageData = { type: 'final', author: authorName, sns: snsAccount, profileImage: userProfileImageBase64 };
+        
+        generatedPagesData = [...essayPagesData, finalPageData];
 
-        generatedPagesData.push({ type: 'final', author: authorName, sns: snsAccount, profileImage: userProfileImageBase64 });
-        addPageToPreview({ author: authorName, sns: snsAccount, profileImage: userProfileImageBase64, isFinal: true, config: config });
-
-        previewSection.style.display = 'block';
-        showLoading(false);
+        const imageGenerationPromises = generatedPagesData.map((pData, idx) =>
+            addGeneratedImageToDisplay(pData, config, idx)
+        );
+        
+        try {
+            await Promise.all(imageGenerationPromises);
+            previewSection.style.display = 'block';
+        } catch (error) {
+            console.error("Error during image generation for display:", error);
+            // showError is called within addGeneratedImageToDisplay for individual errors
+        } finally {
+            showLoading(false);
+        }
     });
 
     downloadZipButton.addEventListener('click', async () => {
-        console.log("Download ZIP button clicked");
         const config = getSelectedSnsConfig();
         if (!config) return;
         if (generatedPagesData.length === 0) {
-            showError('まずプレビューを生成してください。');
+            showError('まず画像を生成してください。');
             return;
         }
         showLoading(true);
@@ -216,17 +212,24 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             for (let i = 0; i < generatedPagesData.length; i++) {
                 const pageInfo = generatedPagesData[i];
-                const imageContainer = createActualImageContainer(pageInfo, config, i + 1);
-                const canvas = await html2canvas(imageContainer, {
-                    scale: 2, useCORS: true, backgroundColor: null,
-                    width: config.width, height: config.height,
-                    windowWidth: config.width, windowHeight: config.height, logging: false
-                });
+                let imageDataUrl = pageInfo.imageDataUrl;
+
+                if (!imageDataUrl) { // Should not happen if preview was generated, but as a fallback
+                    console.warn(`ImageDataUrl not found for page ${i + 1}, regenerating...`);
+                    const imageContainer = createActualImageContainer(pageInfo, config, pageInfo.type === 'essay' ? pageInfo.pageNum : generatedPagesData.filter(p => p.type === 'essay').length + 1);
+                    const canvas = await html2canvas(imageContainer, {
+                        scale: 2, useCORS: true, backgroundColor: currentBackgroundColor,
+                        width: config.width, height: config.height,
+                        windowWidth: config.width, windowHeight: config.height, logging: false
+                    });
+                    imageDataUrl = canvas.toDataURL('image/png');
+                    if (imageContainer.parentNode) imageContainer.parentNode.removeChild(imageContainer);
+                }
+                
                 const fileName = pageInfo.type === 'essay'
                     ? `page_${String(pageInfo.pageNum).padStart(2, '0')}.png`
                     : 'final_page.png';
-                zip.file(fileName, canvas.toDataURL('image/png').split(',')[1], { base64: true });
-                if (imageContainer.parentNode) imageContainer.parentNode.removeChild(imageContainer);
+                zip.file(fileName, imageDataUrl.split(',')[1], { base64: true });
             }
             const zipBlob = await zip.generateAsync({ type: 'blob' });
             saveAs(zipBlob, `${currentSelectedSnsKey}_essay_images.zip`);
@@ -238,45 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    downloadIndividualButton.addEventListener('click', async () => {
-        console.log("Download Individual button clicked");
-        const config = getSelectedSnsConfig();
-        if (!config) return;
-        if (generatedPagesData.length === 0) {
-            showError('まずプレビューを生成してください。');
-            return;
-        }
-        showLoading(true);
-        try {
-            for (let i = 0; i < generatedPagesData.length; i++) {
-                const pageInfo = generatedPagesData[i];
-                const imageContainer = createActualImageContainer(pageInfo, config, i + 1);
-                const canvas = await html2canvas(imageContainer, {
-                    scale: 2, useCORS: true, backgroundColor: null,
-                    width: config.width, height: config.height,
-                    windowWidth: config.width, windowHeight: config.height, logging: false
-                });
-                const link = document.createElement('a');
-                const fileName = pageInfo.type === 'essay'
-                    ? `page_${String(pageInfo.pageNum).padStart(2, '0')}.png`
-                    : 'final_page.png';
-                link.download = fileName;
-                link.href = canvas.toDataURL('image/png');
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                if (imageContainer.parentNode) imageContainer.parentNode.removeChild(imageContainer);
-                await new Promise(resolve => setTimeout(resolve, 200));
-            }
-        } catch (err) {
-            console.error('個別画像生成エラー:', err);
-            showError('個別画像の生成中にエラーが発生しました。');
-        } finally {
-            showLoading(false);
-        }
-    });
+    // Individual download button and its listener are removed.
 
-    // --- 主要関数 (V2.6.2から変更なし、ここにペースト) ---
     function splitTextIntoPagesByMarker(text, essayTitle, config, renderer) {
         const rawPages = text.split(PAGE_BREAK_MARKER);
         const finalPages = [];
@@ -289,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let pageIndex = 0; pageIndex < rawPages.length; pageIndex++) {
             const rawPageText = rawPages[pageIndex];
-            let pageContentHeightMax = config.height - (parseInt(COMMON_IMAGE_STYLES.padding) * 2) - parseInt(COMMON_IMAGE_STYLES.pageNumberFontSize) - 20;
+            let pageContentHeightMax = config.height - (parseInt(COMMON_IMAGE_STYLES.padding) * 2) - parseInt(COMMON_IMAGE_STYLES.pageNumberFontSize) - 20; // Approx page num height
             let actualTitleHeight = 0;
 
             if (essayTitle) {
@@ -303,25 +269,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 tempTitleDiv.style.width = `${config.width - (parseInt(COMMON_IMAGE_STYLES.padding) * 2)}px`;
                 renderer.innerHTML = '';
                 renderer.appendChild(tempTitleDiv);
-                actualTitleHeight = renderer.offsetHeight;
+                actualTitleHeight = renderer.offsetHeight; // Corrected: use renderer.offsetHeight
                 pageContentHeightMax -= actualTitleHeight;
             }
             
             renderer.style.width = `${config.width - (parseInt(COMMON_IMAGE_STYLES.padding) * 2)}px`;
             renderer.style.fontSize = `${config.baseFontSize}px`;
-            renderer.style.fontFamily = currentFontFamily;
+            // fontFamily already set on renderer
 
             if (rawPageText.trim() === '') {
                 finalPages.push('');
                 continue;
             }
             
-            renderer.innerHTML = ''; // 本文計測のためにクリア
-            // renderer の幅とフォントサイズは上で設定済みなので、ここでは再設定不要かもしれないが、念のため
+            renderer.innerHTML = ''; 
             renderer.style.width = `${config.width - (parseInt(COMMON_IMAGE_STYLES.padding) * 2)}px`;
             renderer.style.fontSize = `${config.baseFontSize}px`;
 
-            renderer.textContent = rawPageText; // 本文のみで高さを計測
+            renderer.textContent = rawPageText;
             if (renderer.offsetHeight <= pageContentHeightMax) {
                 finalPages.push(rawPageText);
             } else {
@@ -332,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tempTextContainer.style.lineHeight = COMMON_IMAGE_STYLES.lineHeight;
                 tempTextContainer.style.whiteSpace = 'pre-wrap';
                 tempTextContainer.style.wordWrap = 'break-word';
-                renderer.innerHTML = '';
+                renderer.innerHTML = ''; // Clear renderer before appending tempTextContainer
                 renderer.appendChild(tempTextContainer);
 
                 for (let i = 0; i < rawPageText.length; i++) {
@@ -351,13 +316,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentChunk.trim() !== '') {
                     finalPages.push(currentChunk.trimEnd());
                 } else if (finalPages.length > 0 && finalPages[finalPages.length -1].trim() === '' && rawPageText.trim() !== '') {
-                    // Skip
+                    // Skip adding an empty page if the previous was also empty due to splitting
                 } else if (finalPages.length === 0 && currentChunk.trim() === '') {
-                    finalPages.push('');
+                     finalPages.push(''); // Keep if it's the very first page and it's empty
                 }
             }
         }
-        if (finalPages.length === 0 && essayTitle) {
+        if (finalPages.length === 0 && (essayTitle || text.trim() !== '')) { // Ensure at least one page if there's any content
             finalPages.push('');
         }
         return finalPages;
@@ -368,111 +333,60 @@ document.addEventListener('DOMContentLoaded', () => {
         renderer.style.position = 'absolute';
         renderer.style.left = '-99999px';
         renderer.style.top = '-99999px';
-        renderer.style.visibility = 'hidden';
+        renderer.style.visibility = 'hidden'; // Keep it hidden, not 'none' for offsetHeight
         document.body.appendChild(renderer);
         return renderer;
     }
 
-    function addPageToPreview(pageData) {
-        const { title, text, pageNum, totalPages, author, sns, profileImage, isFinal, config } = pageData;
-        const previewContainer = document.createElement('div');
-        previewContainer.classList.add('preview-image-container');
-        const previewScale = 0.15;
-        previewContainer.style.width = `${config.width * previewScale}px`;
-        previewContainer.style.height = `${config.height * previewScale}px`;
+    async function addGeneratedImageToDisplay(pageData, config, pageIndexInArray) {
+        const imageContainerForCanvas = createActualImageContainer(pageData, config, pageData.type === 'essay' ? pageData.pageNum : (generatedPagesData.filter(p => p.type === 'essay').length + 1) );
 
-        const contentArea = document.createElement('div');
-        contentArea.classList.add('content-area-preview');
-        contentArea.style.overflow = 'hidden';
-        const basePreviewFontSize = Math.max(5, config.baseFontSize * previewScale * 0.9);
-        contentArea.style.lineHeight = COMMON_IMAGE_STYLES.lineHeight;
-        contentArea.style.fontFamily = currentFontFamily;
+        try {
+            const canvas = await html2canvas(imageContainerForCanvas, {
+                scale: 2, // Generate high-resolution image
+                useCORS: true,
+                backgroundColor: currentBackgroundColor, // Pass current background color
+                width: config.width,
+                height: config.height,
+                windowWidth: config.width,
+                windowHeight: config.height,
+                logging: false
+            });
 
-        previewContainer.style.backgroundColor = currentBackgroundColor;
-        previewContainer.style.color = currentTextColor;
+            const imgDataUrl = canvas.toDataURL('image/png');
+            
+            // Store for ZIP download
+            generatedPagesData[pageIndexInArray].imageDataUrl = imgDataUrl;
 
-        if (!isFinal) {
-            const previewPadding = Math.max(6, parseInt(COMMON_IMAGE_STYLES.padding) * previewScale * 0.8);
-            contentArea.style.padding = `${previewPadding}px`;
+            const previewImgWrapper = document.createElement('div');
+            previewImgWrapper.classList.add('generated-image-wrapper');
+            
+            const displayWidth = 180; // Adjust this for desired display size in preview area
+            previewImgWrapper.style.width = `${displayWidth}px`;
+            previewImgWrapper.style.height = `${(config.height / config.width) * displayWidth}px`;
+            previewImgWrapper.style.backgroundColor = currentBackgroundColor; // Set wrapper background for consistency
 
-            if (title) {
-                const titleEl = document.createElement('div');
-                titleEl.textContent = title;
-                titleEl.style.fontSize = `${basePreviewFontSize * COMMON_IMAGE_STYLES.titleFontSizeMultiplier}px`;
-                titleEl.style.fontWeight = 'bold';
-                titleEl.style.marginBottom = `${Math.max(4,parseInt(COMMON_IMAGE_STYLES.titleBottomMargin) * previewScale * 0.5)}px`;
-                titleEl.style.textAlign = 'center';
-                if (pageNum > 1) {
-                    titleEl.style.opacity = '0.4';
-                }
-                contentArea.appendChild(titleEl);
+            const imgElement = document.createElement('img');
+            imgElement.src = imgDataUrl;
+            imgElement.alt = pageData.type === 'essay' ? `Page ${pageData.pageNum}` : 'Final Page';
+            // CSS class .generated-image-wrapper img will style this
+
+            previewImgWrapper.appendChild(imgElement);
+            if (previewArea) previewArea.appendChild(previewImgWrapper);
+
+        } catch (err) {
+            console.error('Error generating image for display:', err);
+            const errorPageIdentifier = pageData.type === 'essay' ? `ページ ${pageData.pageNum}` : '最終ページ';
+            showError(`画像 (${errorPageIdentifier}) の表示準備中にエラー: ${err.message}`);
+            throw err; // Re-throw to be caught by Promise.all if needed
+        } finally {
+            if (imageContainerForCanvas && imageContainerForCanvas.parentNode) {
+                imageContainerForCanvas.parentNode.removeChild(imageContainerForCanvas);
             }
-            const textNode = document.createElement('div');
-            textNode.textContent = text;
-            textNode.style.fontSize = `${basePreviewFontSize}px`;
-            contentArea.appendChild(textNode);
-
-            const pageNumberEl = document.createElement('div');
-            pageNumberEl.classList.add('page-number-preview');
-            pageNumberEl.textContent = `${pageNum} / ${totalPages}`;
-            pageNumberEl.style.fontSize = `${Math.max(5, parseInt(COMMON_IMAGE_STYLES.pageNumberFontSize) * previewScale * 0.9)}px`;
-            pageNumberEl.style.color = currentTextColor;
-            pageNumberEl.style.opacity = 0.7;
-            pageNumberEl.style.padding = `${previewPadding * 0.15}px 0`;
-            previewContainer.appendChild(contentArea);
-            previewContainer.appendChild(pageNumberEl);
-        } else {
-            const finalPreviewPadding = Math.max(8, parseInt(COMMON_IMAGE_STYLES.finalPagePadding) * previewScale * 0.8);
-            contentArea.style.padding = `${finalPreviewPadding}px`;
-            contentArea.style.display = 'flex';
-            contentArea.style.flexDirection = 'column';
-            contentArea.style.justifyContent = 'center';
-            contentArea.style.alignItems = 'center';
-            contentArea.style.textAlign = 'center';
-
-            previewContainer.classList.add('final-page-preview');
-            const finalBaseSize = COMMON_IMAGE_STYLES.finalInfoBaseFontSize * previewScale * 0.9;
-
-            if (profileImage) {
-                const imgContainer = document.createElement('div');
-                const previewProfileImgSize = COMMON_IMAGE_STYLES.profileImageSize * previewScale * 0.5;
-                imgContainer.style.width = `${previewProfileImgSize}px`;
-                imgContainer.style.height = `${previewProfileImgSize}px`;
-                imgContainer.style.borderRadius = '50%';
-                imgContainer.style.overflow = 'hidden';
-                imgContainer.style.marginBottom = `${finalBaseSize * 0.2}px`;
-
-                const imgEl = document.createElement('img');
-                imgEl.src = profileImage;
-                imgEl.style.display = 'block';
-                imgEl.style.width = '100%';
-                imgEl.style.height = '100%';
-                imgEl.style.objectFit = 'cover';
-                imgEl.style.objectPosition = 'center center';
-                imgContainer.appendChild(imgEl);
-                contentArea.appendChild(imgContainer);
-            }
-
-            let finalHtml = '';
-            if (author) {
-                finalHtml += `<div class="author-info-preview" style="font-size: ${finalBaseSize * COMMON_IMAGE_STYLES.finalAuthorNameMultiplier}px; font-weight: bold; margin-bottom: ${finalBaseSize * 0.3}px;">${author}</div>`;
-            }
-            if (sns) {
-                finalHtml += `<div class="sns-info-preview" style="font-size: ${finalBaseSize * COMMON_IMAGE_STYLES.finalSnsAccountMultiplier}px; opacity: ${COMMON_IMAGE_STYLES.finalSnsAccountOpacity};">${sns}</div>`;
-            }
-            if (!author && !sns && !profileImage) {
-                finalHtml = `<div style="font-size: ${finalBaseSize * 1.1}px; opacity: 0.7;">Essay2Image</div>`;
-            }
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = finalHtml;
-            Array.from(tempDiv.children).forEach(child => contentArea.appendChild(child));
-
-            previewContainer.appendChild(contentArea);
         }
-        if (previewArea) previewArea.appendChild(previewContainer);
     }
 
-    function createActualImageContainer(pageInfo, config, currentPageNum) {
+    function createActualImageContainer(pageInfo, config, currentPageNumForDisplay) { // Renamed 3rd param for clarity
         const container = document.createElement('div');
         container.style.width = `${config.width}px`;
         container.style.height = `${config.height}px`;
@@ -480,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.boxSizing = 'border-box';
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
-        container.style.overflow = 'hidden';
+        container.style.overflow = 'hidden'; // Important for html2canvas
         container.style.backgroundColor = currentBackgroundColor;
         container.style.color = currentTextColor;
 
@@ -491,11 +405,11 @@ document.addEventListener('DOMContentLoaded', () => {
         contentArea.style.overflow = 'hidden';
         contentArea.style.display = 'flex';
         contentArea.style.flexDirection = 'column';
-        contentArea.style.fontFamily = currentFontFamily;
+        contentArea.style.fontFamily = currentFontFamily; // Ensure font is applied
 
         if (pageInfo.type === 'essay') {
             container.style.padding = COMMON_IMAGE_STYLES.padding;
-            container.style.justifyContent = 'space-between';
+            container.style.justifyContent = 'space-between'; // Ensure page number is at bottom
 
             if (pageInfo.title) {
                 const titleEl = document.createElement('div');
@@ -506,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 titleEl.style.textAlign = 'center';
                 titleEl.style.flexShrink = '0';
                 titleEl.style.fontFamily = currentFontFamily;
-                if (currentPageNum > 1) {
+                if (pageInfo.pageNum > 1) { // Use pageInfo.pageNum
                     titleEl.style.opacity = '0.4';
                 }
                 contentArea.appendChild(titleEl);
@@ -516,33 +430,33 @@ document.addEventListener('DOMContentLoaded', () => {
             textEl.textContent = pageInfo.text;
             textEl.style.fontSize = `${config.baseFontSize}px`;
             textEl.style.lineHeight = COMMON_IMAGE_STYLES.lineHeight;
-            textEl.style.flexGrow = '1';
-            textEl.style.overflow = 'hidden';
+            textEl.style.flexGrow = '1'; // Allow text to take available space
+            textEl.style.overflow = 'hidden'; // Clip if too long (should be handled by splitTextIntoPagesByMarker)
             textEl.style.fontFamily = currentFontFamily;
             contentArea.appendChild(textEl);
+            
+            container.appendChild(contentArea); // Add contentArea first
 
             const pageNumberEl = document.createElement('div');
             pageNumberEl.style.textAlign = 'center';
             pageNumberEl.style.color = currentTextColor;
             pageNumberEl.style.opacity = 0.7;
             pageNumberEl.style.fontSize = COMMON_IMAGE_STYLES.pageNumberFontSize;
-            pageNumberEl.style.paddingTop = '20px';
-            pageNumberEl.style.flexShrink = '0';
-            pageNumberEl.style.fontFamily = COMMON_IMAGE_STYLES.fontFamily;
+            pageNumberEl.style.paddingTop = '20px'; // Space above page number
+            pageNumberEl.style.flexShrink = '0'; // Prevent shrinking
+            pageNumberEl.style.fontFamily = currentFontFamily; // Use current font
             pageNumberEl.textContent = `${pageInfo.pageNum} / ${pageInfo.totalPages}`;
+            container.appendChild(pageNumberEl); // Add pageNumberEl after contentArea
 
-            container.appendChild(contentArea);
-            container.appendChild(pageNumberEl);
-
-        } else { // 最終ページ
+        } else { // Final page
             container.style.padding = COMMON_IMAGE_STYLES.finalPagePadding;
-            container.style.justifyContent = 'center';
+            container.style.justifyContent = 'center'; // Vertically center content
 
-            contentArea.style.justifyContent = 'center';
+            contentArea.style.justifyContent = 'center'; // Center items in contentArea
             contentArea.style.alignItems = 'center';
             contentArea.style.textAlign = 'center';
-            contentArea.style.height = 'auto';
-            contentArea.style.flexGrow = '0';
+            contentArea.style.height = 'auto'; // Adjust to content
+            contentArea.style.flexGrow = '0'; // Don't let it grow unnecessarily
 
             if (pageInfo.profileImage) {
                 const imgContainer = document.createElement('div');
@@ -550,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgContainer.style.height = `${COMMON_IMAGE_STYLES.profileImageSize}px`;
                 imgContainer.style.borderRadius = '50%';
                 imgContainer.style.overflow = 'hidden';
-                imgContainer.style.marginBottom = '20px';
+                imgContainer.style.marginBottom = '20px'; // Space below image
 
                 const imgEl = document.createElement('img');
                 imgEl.src = pageInfo.profileImage;
@@ -564,30 +478,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const finalBaseSize = COMMON_IMAGE_STYLES.finalInfoBaseFontSize;
-            let authorHtml = '';
+            let infoHtml = '';
             if (pageInfo.author) {
-                authorHtml = `<div style="font-size: ${finalBaseSize * COMMON_IMAGE_STYLES.finalAuthorNameMultiplier}px; font-weight: bold; margin-bottom: ${finalBaseSize * 0.3}px;">${pageInfo.author}</div>`;
+                infoHtml += `<div style="font-size: ${finalBaseSize * COMMON_IMAGE_STYLES.finalAuthorNameMultiplier}px; font-weight: bold; margin-bottom: ${finalBaseSize * 0.3}px; font-family: ${currentFontFamily};">${pageInfo.author}</div>`;
             }
-            let snsHtml = '';
             if (pageInfo.sns) {
-                snsHtml = `<div style="font-size: ${finalBaseSize * COMMON_IMAGE_STYLES.finalSnsAccountMultiplier}px; opacity: ${COMMON_IMAGE_STYLES.finalSnsAccountOpacity};">${pageInfo.sns}</div>`;
+                infoHtml += `<div style="font-size: ${finalBaseSize * COMMON_IMAGE_STYLES.finalSnsAccountMultiplier}px; opacity: ${COMMON_IMAGE_STYLES.finalSnsAccountOpacity}; font-family: ${currentFontFamily};">${pageInfo.sns}</div>`;
             }
             if (!pageInfo.author && !pageInfo.sns && !pageInfo.profileImage) {
-                 contentArea.innerHTML += `<div style="font-size: ${finalBaseSize * 1.2}px; opacity: 0.7;">Essay2Image</div>`;
-            } else {
-                 contentArea.innerHTML += authorHtml + snsHtml;
+                 infoHtml += `<div style="font-size: ${finalBaseSize * 1.2}px; opacity: 0.7; font-family: ${currentFontFamily};">Essay2Image</div>`;
             }
+            contentArea.innerHTML += infoHtml; // Append new HTML
 
-            Array.from(contentArea.children).forEach(child => {
-                if(child.tagName !== 'DIV' || !child.querySelector('img')) {
-                    child.style.fontFamily = currentFontFamily;
-                }
-            });
             container.appendChild(contentArea);
         }
+        // Temporarily append to body for html2canvas to work correctly with dimensions
         container.style.position = 'absolute';
-        container.style.left = '-99999px';
-        container.style.top = '-99999px';
+        container.style.left = '-99999px'; // Off-screen
+        container.style.top = '-99999px';  // Off-screen
         document.body.appendChild(container);
         return container;
     }
@@ -596,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loadingMessage) loadingMessage.style.display = isLoading ? 'block' : 'none';
         if (generatePreviewButton) generatePreviewButton.disabled = isLoading;
         if (downloadZipButton) downloadZipButton.disabled = isLoading;
-        if (downloadIndividualButton) downloadIndividualButton.disabled = isLoading;
+        // Individual download button removed
         if (isLoading && errorMessage) errorMessage.style.display = 'none';
     }
 
