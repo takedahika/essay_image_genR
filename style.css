@@ -15,16 +15,56 @@ body {
     line-height: 1.7;
     background-color: #f8f9fa;
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 40px;
+    /* display: flex; justify-content: center; align-items: flex-start; moved to main-app-container */
+    padding-top: 40px; /* This padding might be reconsidered or applied to main-app-container */
     padding-bottom: 40px;
     padding-left: 20px;
     padding-right: 20px;
 }
 
-.container {
+/* 初期読み込みアニメーション */
+#page-load-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa; /* Match body background */
+    z-index: 10000;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease-out; /* For fade out */
+}
+
+#animated-heading {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 2.5em;
+    color: #2c3e50;
+    font-weight: 700;
+    line-height: 1.4;
+    padding: 0 20px;
+    max-width: 90vw;
+}
+
+#animated-heading .anim-char {
+    display: inline-block;
+    opacity: 0;
+    transform: scale(0.5) translateY(30px);
+    transition: opacity 0.35s ease-out, transform 0.45s cubic-bezier(0.175, 0.885, 0.320, 1.275); /* "Pop" effect */
+    margin: 0 1px; /* Minimal spacing, adjust if needed */
+}
+
+#animated-heading .anim-char.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+
+/* メインアプリコンテナ */
+#main-app-container {
     width: 100%;
     max-width: 700px;
     background-color: #fff;
@@ -32,6 +72,14 @@ body {
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     text-align: left;
+    margin: 0 auto; /* Center the container once body padding is removed/adjusted */
+    opacity: 0; /* Initial state for fade-in */
+    transition: opacity 0.5s ease-in; /* Fade-in transition */
+}
+
+
+.container { /* Existing styles for .container, now targeted by #main-app-container if specific id styling is used */
+    /* width, max-width etc. are now on #main-app-container */
 }
 
 .sub-header {
@@ -308,6 +356,15 @@ h2 {
     min-width: 200px; /* 最低幅 */
 }
 
+.download-note {
+    text-align: center;
+    font-size: 0.85em;
+    color: #555;
+    margin-top: 8px; /* ZIPボタンとの間隔 */
+    margin-bottom: 15px; /* プレビューエリアとの間隔 */
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
 .download-button {
     background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
 }
@@ -346,7 +403,7 @@ h2 {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    margin-top: 15px;
+    /* margin-top: 15px; /* download-noteのマージンで調整 */
     margin-bottom: 20px;
     padding: 15px;
     background-color: #f0f2f5; 
@@ -395,13 +452,16 @@ h2 {
 /* =============================================== */
 @media (max-width: 768px) {
     body {
-        padding-top: 20px;
+        padding-top: 20px; /* Adjust if #main-app-container takes over vertical centering */
         padding-bottom: 20px;
         padding-left: 10px;
         padding-right: 10px;
     }
-    .container {
+    #main-app-container { /* Was .container */
         padding: 20px 15px;
+    }
+    #animated-heading {
+        font-size: 2em;
     }
 
     h1 {
@@ -469,23 +529,29 @@ h2 {
     .download-options .action-button {
         min-width: 180px;
     }
+    .download-note {
+        font-size: 0.8em;
+    }
 
 
     #preview-area {
         gap: 10px;
         padding: 10px;
     }
-    /* .generated-image-wrapper {} は削除 (元々空だったため) */
 }
 
 @media (max-width: 480px) {
     body {
-        padding: 10px 5px;
+        padding: 10px 5px; /* Adjust if #main-app-container takes over vertical centering */
     }
-    .container {
+    #main-app-container { /* Was .container */
         padding: 15px 10px;
         border-radius: 8px;
     }
+    #animated-heading {
+        font-size: 1.6em;
+    }
+
     h1 {
         font-size: 1.6em;
     }
@@ -516,9 +582,11 @@ h2 {
         min-width: 150px;
         font-size: 0.9em;
     }
+    .download-note {
+        font-size: 0.75em;
+    }
 
     #preview-area {
         justify-content: center;
     }
-    /* .generated-image-wrapper {} は削除 (元々空だったため) */
 }

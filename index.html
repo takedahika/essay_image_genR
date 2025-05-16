@@ -11,8 +11,12 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <div class="container">
-        <p class="sub-header">言葉をさらに広めるための</p>
+    <div id="page-load-animation">
+        <h1 id="animated-heading"></h1> <!-- Text content will be set by JavaScript -->
+    </div>
+
+    <div class="container" id="main-app-container" style="display: none; opacity: 0;">
+        <p class="sub-header">言葉をさらに広げるための</p>
         <h1>画像メーカー</h1>
 
         <div class="section">
@@ -108,8 +112,8 @@
 
             <div class="download-options">
                 <button id="download-zip-button" class="action-button download-button">ZIPで一括ダウンロード</button>
-                <!-- 個別ダウンロードボタンは削除 -->
             </div>
+            <p class="download-note">※スマホの方は各画像を長押ししても保存できます。</p>
 
             <div id="preview-area">
                 <!-- ここにJSで生成画像が表示される -->
@@ -126,16 +130,9 @@
         <div id="error-message" style="display: none;"></div>
     </div>
 
-    <div id="loading-message" style="display: none;">
-        <div class="spinner"></div>
-        <span class="loading-text">処理中です... しばらくお待ちください。</span>
-    </div>
-    <div id="error-message" style="display: none;"></div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
-
     <script src="script.js"></script>
 </body>
 </html>
