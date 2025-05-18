@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         animatedHeading.innerHTML = ''; // Clear original text or any pre-existing content
 
         const textLines = [
-            "言葉を",
-            "さらに広げるための",
+            "書き手のための",
+            "SNSシェア",
             "画像メーカー"
         ];
 
